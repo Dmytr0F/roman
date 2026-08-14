@@ -155,6 +155,41 @@
       display: block;
       background: transparent;
       outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .unity-loader {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--body);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .unity-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .unity-loader-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(95, 99, 104, 0.2);
+      border-top-color: #5f6368;
+      border-radius: 50%;
+      animation: unity-spin 0.9s linear infinite;
+    }
+
+    @keyframes unity-spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     #unity-loading-bar,
@@ -181,6 +216,9 @@
   <main class="offline-page" aria-label="Offline error page">
     <div id="unity-container">
       <canvas id="unity-canvas" width="600" height="150" tabindex="-1" aria-label="Unity WebGL game canvas"></canvas>
+      <div id="unity-loader" class="unity-loader" aria-live="polite" aria-label="Loading Unity game">
+        <div class="unity-loader-spinner" aria-hidden="true"></div>
+      </div>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -211,6 +249,13 @@
 
   <script>
     const canvas = document.querySelector("#unity-canvas");
+    const unityLoader = document.querySelector("#unity-loader");
+
+    function hideUnityLoader() {
+      if (unityLoader) {
+        unityLoader.classList.add("hidden");
+      }
+    }
 
     function unityShowBanner(msg, type) {
       const warningBanner = document.querySelector("#unity-warning");
@@ -267,11 +312,13 @@
           progressBar.style.width = 100 * progress + "%";
         }
       }).then((unityInstance) => {
+        hideUnityLoader();
         const fullscreenButton = document.querySelector("#unity-fullscreen-button");
         if (fullscreenButton) {
           fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
         }
       }).catch((message) => {
+        hideUnityLoader();
         alert(message);
       });
     };
