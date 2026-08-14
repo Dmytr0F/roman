@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+  <title>No internet</title>
+  <link rel="icon" href="Build/TemplateData/favicon.ico">
+  <style>
+    :root {
+      color-scheme: light;
+      --heading: #202124;
+      --body: #5f6368;
+      --line: #dadce0;
+      --bg: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--body);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .offline-page {
+      width: min(100%, 560px);
+      height: 100vh;
+      padding: 20px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .offline-copy {
+      width: min(100%, 460px);
+    }
+
+    .offline-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      color: var(--body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 0;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .offline-icon::before,
+    .offline-icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      opacity: 0.9;
+    }
+
+    .offline-icon::before {
+      top: 8px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .offline-icon::after {
+      top: 16px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .offline-icon span {
+      position: absolute;
+      left: 50%;
+      top: 28px;
+      width: 6px;
+      height: 6px;
+      margin-left: -3px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--heading);
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.25;
+    }
+
+    .try-copy {
+      margin: 18px 0 0;
+      color: var(--body);
+      font-size: 14px;
+    }
+
+    ul {
+      display: inline-block;
+      margin: 8px 0 0;
+      padding-left: 22px;
+      text-align: left;
+    }
+
+    li + li {
+      margin-top: 4px;
+    }
+
+    .error-code {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--body);
+      letter-spacing: 0.01em;
+    }
+
+    #unity-container {
+      width: min(100%, 520px);
+      max-width: 520px;
+      aspect-ratio: 600 / 150;
+      position: relative;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: transparent;
+      outline: none;
+    }
+
+    #unity-loading-bar,
+    #unity-warning,
+    #unity-footer {
+      display: none;
+    }
+
+    @media (max-height: 700px) {
+      .offline-page {
+        gap: 14px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+
+      .offline-copy {
+        transform: scale(0.96);
+        transform-origin: center top;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="offline-page" aria-label="Offline error page">
+    <div id="unity-container">
+      <canvas id="unity-canvas" width="600" height="150" tabindex="-1" aria-label="Unity WebGL game canvas"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"></div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">Rome</div>
+      </div>
+    </div>
+
+    <section class="offline-copy" aria-labelledby="offline-title">
+      <h1 id="offline-title">No internet</h1>
+      <div class="try-copy">
+        Try:
+        <ul>
+          <li>Checking the network cables, modem, and router</li>
+          <li>Reconnecting to Wi-Fi</li>
+          <li>Running Windows Network Diagnostics</li>
+        </ul>
+      </div>
+      <div class="error-code">ERR_INTERNET_DISCONNECTED</div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+
+    function unityShowBanner(msg, type) {
+      const warningBanner = document.querySelector("#unity-warning");
+      function updateBannerVisibility() {
+        warningBanner.style.display = warningBanner.children.length ? "block" : "none";
+      }
+      const div = document.createElement("div");
+      div.innerHTML = msg;
+      warningBanner.appendChild(div);
+      if (type === "error") {
+        div.style = "background: red; padding: 10px;";
+      } else {
+        if (type === "warning") {
+          div.style = "background: yellow; padding: 10px;";
+        }
+        setTimeout(() => {
+          warningBanner.removeChild(div);
+          updateBannerVisibility();
+        }, 5000);
+      }
+      updateBannerVisibility();
+    }
+
+    const buildUrl = "Build/Build";
+    const loaderUrl = buildUrl + "/Build.loader.js";
+    const config = {
+      arguments: [],
+      dataUrl: buildUrl + "/Build.data.br",
+      frameworkUrl: buildUrl + "/Build.framework.js.br",
+      codeUrl: buildUrl + "/Build.wasm.br",
+      webglContextAttributes: {
+        alpha: true,
+        preserveDrawingBuffer: false,
+        powerPreference: 2
+      },
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "Rome",
+      productVersion: "1.0",
+      showBanner: unityShowBanner
+    };
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      canvas.classList.add("unity-mobile");
+      document.querySelector("#unity-container").classList.add("unity-mobile");
+    }
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        const progressBar = document.querySelector("#unity-progress-bar-full");
+        if (progressBar) {
+          progressBar.style.width = 100 * progress + "%";
+        }
+      }).then((unityInstance) => {
+        const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+        if (fullscreenButton) {
+          fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
+        }
+      }).catch((message) => {
+        alert(message);
+      });
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
