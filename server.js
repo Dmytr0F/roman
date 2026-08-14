@@ -65,6 +65,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(port, '127.0.0.1', () => {
-  console.log(`Serving ${root} on http://127.0.0.1:${port}/`);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Serving ${root} on port ${port}`);
 });
